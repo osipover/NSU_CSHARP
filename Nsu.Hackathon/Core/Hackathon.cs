@@ -3,22 +3,14 @@
 using Nsu.HackathonProblem.Model;
 using Nsu.HackathonProblem.Service;
 
-class Hackathon {
+class Hackathon(
+    HRManager hrManager, 
+    HRDirector hrDirector
+) {
 
-    public Hackathon(IWishlistProvider wishlistProvider, List<Employee> juniors, List<Employee> teamleads) {
-        this.wishlistProvider = wishlistProvider;
-        Juniors = juniors;
-        Teamleads = teamleads;
-    }
-
-
-    public List<Employee> Juniors { get; set; }
-    public List<Employee> Teamleads { get; set; }
-
-    private IWishlistProvider wishlistProvider;
-
-    public (List<Wishlist>, List<Wishlist>) GetWishlists() {
-        var (juniorsWishlists, teamleadsWishlists) = wishlistProvider.GetWishlists(Juniors, Teamleads);
-        return (juniorsWishlists, teamleadsWishlists);
+    public double Start(List<Employee> juniors, List<Employee> teamleads)
+    {
+        List<Team> teams = hrManager.CreateTeams(juniors, teamleads);
+        return hrDirector.EvaluateTeams(teams);
     }
 }

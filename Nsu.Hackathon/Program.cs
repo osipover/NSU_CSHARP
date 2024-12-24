@@ -20,10 +20,11 @@ class Program
                 services.AddTransient<IEmployeeProvider, CsvEmployeeReader>();
                 services.AddTransient<IWishlistProvider, RandomWishlistProvider>();
                 services.AddTransient<ITeamBuildingStrategy, TeamBuildingStrategy>();
-                services.AddTransient<IRatingService, RatingService>();
+                services.AddTransient<IRatingService, HarmonicMeanRatingService>();
 
                 services.AddTransient<HRManager>();
                 services.AddTransient<HRDirector>();
+                services.AddTransient<Hackathon>();
             })
             .Build();
 

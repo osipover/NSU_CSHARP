@@ -10,7 +10,8 @@ namespace Nsu.HackathonProblem.Service
             List<Employee> teamleads,             
             List<Wishlist> juniorsWishlists,
             List<Wishlist> teamLeadsWishlists
-        ) {
+        ) 
+        {
             var juniorsDictionary = juniors.ToDictionary(j => j.Id, j => j);
             var freeTeamLeads = new List<Employee>(teamleads);
             var pairs = new Dictionary<Employee, Employee>(); // Занятые тимлиды и их джуны
@@ -55,14 +56,13 @@ namespace Nsu.HackathonProblem.Service
                     }
                 }
             }
-
             // Формируем список команд
             return pairs.Select(p => 
                 new Team(
                     p.Key,
                     p.Value, 
-                    juniorSatisfactions[p.Key.Id][p.Value.Id],
-                    teamleadSatisfactions[p.Value.Id][p.Key.Id]
+                    juniorSatisfactions[p.Value.Id][p.Key.Id],
+                    teamleadSatisfactions[p.Key.Id][p.Value.Id]
                 )
             ).ToList();
         }

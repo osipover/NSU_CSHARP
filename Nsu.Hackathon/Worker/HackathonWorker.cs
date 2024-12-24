@@ -9,7 +9,7 @@ namespace Nsu.HackathonProblem.Workers
 
     class HackathonWorker(
         IOptions<Configuration> config,
-        HRDirector hrDirector,
+        Hackathon hackathon,
         IEmployeeProvider employeeProvider
     ) : IHostedService
     {    
@@ -17,13 +17,25 @@ namespace Nsu.HackathonProblem.Workers
         {
             var juniors = employeeProvider.GetEmployees(config.Value.JuniorsPath);
             var teamLeads = employeeProvider.GetEmployees(config.Value.TeamleadsPath);
-            hrDirector.OrganizeHackathon(config.Value.NumRounds, juniors, teamLeads);
+            OrganizeHackathons(config.Value.NumRounds, juniors, teamLeads);
             return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
+        }
+
+        private void OrganizeHackathons(int numOfHackathons, List<Employee> juniors, List<Employee> teamLeads) 
+        {
+            double totalHarmony = 0;
+            for (int i = 0; i < numOfHackathons; ++i) {
+                var harmony = hackathon.Start(juniors, teamLeads);
+                Console.WriteLine($"HACKATHON №{i + 1}:\tharmony={harmony}");
+                totalHarmony += harmony;
+            }
+            double averageHarmony = totalHarmony / numOfHackathons;
+            Console.WriteLine($"Average harmony = {averageHarmony}");
         }
     }
     

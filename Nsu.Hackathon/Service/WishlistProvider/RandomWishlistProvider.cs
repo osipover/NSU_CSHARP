@@ -2,7 +2,7 @@ using Nsu.HackathonProblem.Model;
 
 namespace Nsu.HackathonProblem.Service;
 
-class RandomWishlistProvider : IWishlistProvider
+public class RandomWishlistProvider : IWishlistProvider
 {
 
     private static Random _random = new Random();
