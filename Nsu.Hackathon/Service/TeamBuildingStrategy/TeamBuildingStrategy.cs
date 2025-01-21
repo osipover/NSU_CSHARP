@@ -1,39 +1,39 @@
-using Nsu.HackathonProblem.Model;
+using Nsu.HackathonProblem.Model.Dto;
 
 namespace Nsu.HackathonProblem.Service
 {
     public class TeamBuildingStrategy : ITeamBuildingStrategy
     {
 
-        public List<Team> BuildTeams(            
-            List<Employee> juniors,
-            List<Employee> teamleads,             
-            List<Wishlist> juniorsWishlists,
-            List<Wishlist> teamLeadsWishlists
-        ) 
+        public List<TeamDto> BuildTeams(
+            List<WishlistDto> juniorsWishlists,
+            List<WishlistDto> teamLeadsWishlists
+        )
         {
-            var juniorsDictionary = juniors.ToDictionary(j => j.Id, j => j);
-            var freeTeamLeads = new List<Employee>(teamleads);
-            var pairs = new Dictionary<Employee, Employee>(); // Занятые тимлиды и их джуны
+            // Извлечение списка джунов и тимлидов из WishlistDto
+            var juniors = juniorsWishlists.Select(w => w.employee).Distinct().ToList();
+            var teamleads = teamLeadsWishlists.Select(w => w.employee).Distinct().ToList();
 
-            // Создание словаря предпочтений для быстрого доступа
+            var freeTeamLeads = new List<EmployeeDto>(teamleads);
+            var pairs = new Dictionary<EmployeeDto, EmployeeDto>(); // Занятые тимлиды и их джуны
+
+            // Создание словарей предпочтений
             var teamleadsPreferences = CreatePreferencesDictionary(teamLeadsWishlists);
             var juniorsPreferences = CreatePreferencesDictionary(juniorsWishlists);
 
             // Создание словарей индексов удовлетворенности
-            var juniorSatisfactions = CreateSatisfactionDictionary(juniors, teamleads, juniorsWishlists);
-            var teamleadSatisfactions = CreateSatisfactionDictionary(teamleads, juniors, teamLeadsWishlists);
+            var juniorSatisfactions = CreateSatisfactionDictionary(juniorsPreferences);
+            var teamleadSatisfactions = CreateSatisfactionDictionary(teamleadsPreferences);
 
             while (freeTeamLeads.Any())
             {
                 // Выбор первого свободного тимлида
                 var teamLead = freeTeamLeads.First();
-                var preferences = teamleadsPreferences[teamLead.Id];
-                
+                var preferences = teamleadsPreferences[teamLead];
+
                 // Предложение первому джуну в списке предпочтений
-                foreach (var juniorId in preferences)
+                foreach (var (junior, preference) in preferences.OrderByDescending(p => p.Value))
                 {
-                    var junior = juniorsDictionary[juniorId];
                     if (!pairs.ContainsValue(junior)) // Если джун еще не занят
                     {
                         pairs[teamLead] = junior;
@@ -43,8 +43,8 @@ namespace Nsu.HackathonProblem.Service
                     else
                     {
                         // Проверяем, предпочитает ли джун этого тимлида
-                        var currentTeamLeadByJunior = pairs.First(p => p.Value.Id == juniorId).Key;
-                        if (juniorSatisfactions[juniorId][teamLead.Id] > juniorSatisfactions[juniorId][currentTeamLeadByJunior.Id])
+                        var currentTeamLeadByJunior = pairs.First(p => p.Value == junior).Key;
+                        if (juniorSatisfactions[junior][teamLead] > juniorSatisfactions[junior][currentTeamLeadByJunior])
                         {
                             // Если текущий тимлид менее предпочтителен, заменяем
                             pairs.Remove(currentTeamLeadByJunior);
@@ -56,38 +56,28 @@ namespace Nsu.HackathonProblem.Service
                     }
                 }
             }
+
             // Формируем список команд
-            return pairs.Select(p => 
-                new Team(
+            return pairs.Select(p =>
+                new TeamDto(
                     p.Key,
-                    p.Value, 
-                    juniorSatisfactions[p.Value.Id][p.Key.Id],
-                    teamleadSatisfactions[p.Key.Id][p.Value.Id]
+                    p.Value,
+                    juniorSatisfactions[p.Value][p.Key],
+                    teamleadSatisfactions[p.Key][p.Value]
                 )
             ).ToList();
         }
 
-        public int CalcIndexOfSatisfaction(int index, int numOfCandidates) 
+        private Dictionary<EmployeeDto, Dictionary<EmployeeDto, int>> CreateSatisfactionDictionary(Dictionary<EmployeeDto, Dictionary<EmployeeDto, int>> preferences)
         {
-            return numOfCandidates - index;
+            // Индексы удовлетворенности теперь можно напрямую использовать из предпочтений
+            return preferences;
         }
 
-        private Dictionary<int, Dictionary<int, int>> CreateSatisfactionDictionary(List<Employee> employeesFirst, List<Employee> employeesSecond, List<Wishlist> wishlists) 
+        private Dictionary<EmployeeDto, Dictionary<EmployeeDto, int>> CreatePreferencesDictionary(List<WishlistDto> wishlists)
         {
-            var satisfactions = employeesFirst.ToDictionary(j => j.Id, j => new Dictionary<int, int>());
-            foreach (var wishlist in wishlists)
-            {
-                for (int i = 0; i < wishlist.DesiredEmployees.Length; i++)
-                {
-                    satisfactions[wishlist.EmployeeId][wishlist.DesiredEmployees[i]] = CalcIndexOfSatisfaction(i, employeesSecond.Count); // Индекс предпочтения
-                }
-            }
-            return satisfactions;
-        }
-
-        private Dictionary<int, int[]> CreatePreferencesDictionary(List<Wishlist> wishlists) 
-        {
-            return wishlists.ToDictionary(w => w.EmployeeId, w => w.DesiredEmployees);
+            // Теперь предпочтения уже представлены в виде Dictionary<EmployeeDto, int>
+            return wishlists.ToDictionary(w => w.employee, w => w.preferredEmployee);
         }
     }
 }

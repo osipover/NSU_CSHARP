@@ -1,12 +1,12 @@
 using Microsoft.VisualBasic;
-using Nsu.HackathonProblem.Model;
+using Nsu.HackathonProblem.Model.Dto;
 
 namespace Nsu.HackathonProblem.Service;
 
 class CsvEmployeeReader : IEmployeeProvider
 {
-    public List<Employee> GetEmployees(string filePath) {
-        var employees = new List<Employee>();
+    public List<EmployeeDto> GetEmployees(string filePath) {
+        var employees = new List<EmployeeDto>();
         try
         {
             using (var reader = new StreamReader(filePath))
@@ -19,7 +19,7 @@ class CsvEmployeeReader : IEmployeeProvider
 
                     if (TryReadEmployee(line, out int id, out string name))
                     {
-                        var employee = new Employee(id, name);
+                        var employee = new EmployeeDto(id, name);
                         employees.Add(employee);
                     }
                 }

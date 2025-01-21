@@ -1,10 +1,10 @@
-using Nsu.HackathonProblem.Model;
+using Nsu.HackathonProblem.Model.Dto;
 
 namespace Nsu.HackathonProblem.Service
 {
     public interface IWishlistProvider
     {
 
-        (List<Wishlist>, List<Wishlist>) GetWishlists(List<Employee> juniors, List<Employee> teamleads);
+        (List<WishlistDto>, List<WishlistDto>) GetWishlists(List<EmployeeDto> juniors, List<EmployeeDto> teamleads);
     }
 }

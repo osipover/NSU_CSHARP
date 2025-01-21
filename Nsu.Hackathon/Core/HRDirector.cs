@@ -1,10 +1,10 @@
-using Nsu.HackathonProblem.Model;
+using Nsu.HackathonProblem.Model.Dto;
 using Nsu.HackathonProblem.Service;
 
 public class HRDirector(IRatingService ratingService) 
 {
 
-    public double EvaluateTeams(List<Team> teams) 
+    public double EvaluateTeams(List<TeamDto> teams) 
     {
         List<double> priorities = new List<double>();
         teams.ForEach(team => {

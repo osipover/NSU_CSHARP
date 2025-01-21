@@ -1,13 +1,18 @@
-using Nsu.HackathonProblem.Model;
+using Nsu.HackathonProblem.Model.Dto;
 using Nsu.HackathonProblem.Service;
 
 public class HRManager(
     ITeamBuildingStrategy teamBuildingStrategy,
     IWishlistProvider wishlistProvider
 ) {
-    public List<Team> CreateTeams(List<Employee> juniors, List<Employee> teamLeads) 
+
+    public (List<WishlistDto>, List<WishlistDto>) GetWishlists(List<EmployeeDto> juniors, List<EmployeeDto> teamLeads)
     {
-        var (juniorsWishlists, teamleadsWishlists) = wishlistProvider.GetWishlists(juniors, teamLeads);
-        return teamBuildingStrategy.BuildTeams(juniors, teamLeads, juniorsWishlists, teamleadsWishlists);
+        return wishlistProvider.GetWishlists(juniors, teamLeads);
+    }
+
+    public List<TeamDto> CreateTeams(List<WishlistDto> juniorsWishlists, List<WishlistDto> teamleadsWishlists) 
+    {
+        return teamBuildingStrategy.BuildTeams(juniorsWishlists, teamleadsWishlists);
     } 
 }

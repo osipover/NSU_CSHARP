@@ -1,15 +1,13 @@
-using Nsu.HackathonProblem.Model;
+using Nsu.HackathonProblem.Model.Dto;
 
 namespace Nsu.HackathonProblem.Service
 {
     public interface ITeamBuildingStrategy
     {
 
-        List<Team> BuildTeams(
-            List<Employee> juniors, 
-            List<Employee> teamleads,
-            List<Wishlist> juniorsWishlists, 
-            List<Wishlist> teamleadWishlists
+        List<TeamDto> BuildTeams(
+            List<WishlistDto> juniorsWishlists,
+            List<WishlistDto> teamLeadsWishlists
         );
     }
 }

@@ -1,8 +1,13 @@
 ﻿
 using Nsu.HackathonProblem.Model;
+using Nsu.HackathonProblem.Database;
 using Nsu.HackathonProblem.Service;
+using Nsu.HackathonProblem.Repository;
+
+using Microsoft.EntityFrameworkCore;
 using Nsu.HackathonProblem.Workers;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 class Program 
@@ -15,6 +20,10 @@ class Program
             {
                 services.Configure<Configuration>(context.Configuration.GetSection("Hackathon"));
 
+                services.AddDbContext<HackathonDB>(options =>
+                    options.UseNpgsql(context.Configuration.GetConnectionString("HackathonDB"))
+                );
+
                 services.AddHostedService<HackathonWorker>();
 
                 services.AddTransient<IEmployeeProvider, CsvEmployeeReader>();
@@ -24,10 +33,16 @@ class Program
 
                 services.AddTransient<HRManager>();
                 services.AddTransient<HRDirector>();
-                services.AddTransient<Hackathon>();
+                
+                services.AddTransient<HackathonService>();
+                services.AddTransient<WishlistService>();
+                services.AddTransient<EmployeeService>();
+
+                services.AddTransient<IHackathonRepository, HackathonRepository>();
+                services.AddTransient<IEmployeeRepository, EmployeeRepository>();
+                services.AddTransient<IWishlistRepository, WishlistRepository>();
             })
             .Build();
-
-        host.Run();
+            host.Run();    
     }
 }

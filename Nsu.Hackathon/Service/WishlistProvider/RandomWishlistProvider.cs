@@ -1,4 +1,4 @@
-using Nsu.HackathonProblem.Model;
+using Nsu.HackathonProblem.Model.Dto;
 
 namespace Nsu.HackathonProblem.Service;
 
@@ -7,29 +7,30 @@ public class RandomWishlistProvider : IWishlistProvider
 
     private static Random _random = new Random();
 
-    public (List<Wishlist>, List<Wishlist>) GetWishlists(List<Employee> juniors, List<Employee> teamleads) {
-        List<Wishlist> juniorsWishlists = new List<Wishlist>();
-        List<Wishlist> teamleadsWishlists = new List<Wishlist>();
+    public (List<WishlistDto>, List<WishlistDto>) GetWishlists(List<EmployeeDto> juniors, List<EmployeeDto> teamleads) {
+        List<WishlistDto> juniorsWishlists = new List<WishlistDto>();
+        List<WishlistDto> teamleadsWishlists = new List<WishlistDto>();
         
         juniors.ForEach(junior => juniorsWishlists.Add(generateRandomWishlist(junior, teamleads)));
         teamleads.ForEach(teamlead => teamleadsWishlists.Add(generateRandomWishlist(teamlead, juniors)));
         return (juniorsWishlists, teamleadsWishlists);
     }
 
-    private Wishlist generateRandomWishlist(Employee employee, List<Employee> employees) {
-        int employeeId = employee.Id;
+    private WishlistDto generateRandomWishlist(EmployeeDto employee, List<EmployeeDto> employees) {
         Shuffle(employees);
-        int[] employeesIds = employees.Select(e => e.Id).ToArray();
-        Wishlist wishlist = new Wishlist(employeeId, employeesIds);
+        var preferedEmployees = employees
+            .Select((value, index) => new { value, index })
+            .ToDictionary(x => x.value, x => x.index);
+        WishlistDto wishlist = new WishlistDto(employee, preferedEmployees);
         return wishlist;
     }
 
-    private void Shuffle(List<Employee> employees) {
+    private void Shuffle(List<EmployeeDto> employees) {
         int n = employees.Count;
         while (n > 1)
         {
             int k = _random.Next(n--);
-            Employee employee = employees[n];
+            EmployeeDto employee = employees[n];
             employees[n] = employees[k];
             employees[k] = employee;
         }
