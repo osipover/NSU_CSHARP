@@ -68,15 +68,11 @@ public class HackathonRepositoryTests
             new Hackathon { Harmony = 10.0m },
             new Hackathon { Harmony = 20.0m }
         };
-
         foreach (var hackathon in hackathons)
         {
             _repository.Save(hackathon);
         }
-
-
         var averageHarmony = _repository.CalculateAverageHarmony();
-
         Assert.Equal(15.0d, averageHarmony);
     }
 }
