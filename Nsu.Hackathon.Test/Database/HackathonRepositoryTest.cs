@@ -4,7 +4,7 @@ using Nsu.HackathonProblem.Database;
 using Nsu.HackathonProblem.Model.Entity;
 using Nsu.HackathonProblem.Repository;
 
-namespace Nsu.HackathonProblem.Test;
+namespace Nsu.HackathonProblem.Test.Database;
 
 public class HackathonRepositoryTests
 {
@@ -28,9 +28,9 @@ public class HackathonRepositoryTests
     {
         var hackathon = new Hackathon { Harmony = 10.0m };
 
-        _repository.SaveHackathon(hackathon);
+        _repository.Save(hackathon);
 
-        var savedHackathon = _repository.GetHackathonById(hackathon.Id);
+        var savedHackathon = _repository.FindById(hackathon.Id);
         Assert.NotNull(savedHackathon);
         Assert.Equal(hackathon.Harmony, savedHackathon.Harmony);
     }
@@ -46,9 +46,9 @@ public class HackathonRepositoryTests
             Teams = new List<Team> { team1, team2 }
         };
 
-        _repository.SaveHackathon(hackathon);
+        _repository.Save(hackathon);
 
-        var savedHackathon = _repository.GetHackathonById(hackathon.Id);
+        var savedHackathon = _repository.FindById(hackathon.Id);
 
         Assert.NotNull(savedHackathon);
         Assert.Equal(hackathon.Harmony, savedHackathon.Harmony);
@@ -71,7 +71,7 @@ public class HackathonRepositoryTests
 
         foreach (var hackathon in hackathons)
         {
-            _repository.SaveHackathon(hackathon);
+            _repository.Save(hackathon);
         }
 
 
